@@ -11,6 +11,7 @@ criterion_group!(benches, http1);
 fn http1(c: &mut Criterion) {
     let mut group = c.benchmark_group("hyper concurrent connections");
     let body = &[b'x'; 1024];
+    let response = &[b'r'; 1024];
     let rt = Arc::new(
         tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -18,7 +19,7 @@ fn http1(c: &mut Criterion) {
             .expect("rt build"),
     );
     let exec = rt.clone();
-    let opts = opts();
+    let opts = opts().request_body(body).response_body(response);
     let addr = spawn_server(&rt, &opts);
     let url: hyper::Uri = format!("http://{}/hello", addr).parse().unwrap();
 
